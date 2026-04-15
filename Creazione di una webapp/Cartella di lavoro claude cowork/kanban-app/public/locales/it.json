@@ -1,0 +1,137 @@
+{
+  "app_name": "Kanban App",
+  "login": {
+    "title": "Accedi",
+    "setup_title": "Crea Database",
+    "password": "Password",
+    "confirm_password": "Conferma Password",
+    "btn_login": "Accedi",
+    "btn_create": "Crea Database",
+    "wrong_password": "Password errata. Riprova.",
+    "passwords_mismatch": "Le password non coincidono.",
+    "password_too_short": "La password deve avere almeno 6 caratteri.",
+    "first_run_hint": "Primo avvio: scegli una password per proteggere il database.",
+    "return_login": "Hai già un database?"
+  },
+  "header": {
+    "collaborators": "Collaboratori",
+    "export": "Esporta dati",
+    "logout": "Esci",
+    "back": "← Progetti"
+  },
+  "projects": {
+    "title": "I miei Progetti",
+    "new": "Nuovo Progetto",
+    "empty": "Nessun progetto. Creane uno!",
+    "tasks_total": "task totali",
+    "tasks_done": "completate",
+    "edit": "Modifica progetto",
+    "delete": "Elimina progetto",
+    "open": "Apri kanban",
+    "deadline": "Scadenza"
+  },
+  "project_modal": {
+    "title_new": "Nuovo Progetto",
+    "title_edit": "Modifica Progetto",
+    "name": "Nome *",
+    "description": "Descrizione",
+    "color": "Colore",
+    "deadline": "Scadenza",
+    "save": "Salva",
+    "cancel": "Annulla"
+  },
+  "kanban": {
+    "add_task": "+ Task",
+    "add_column": "+ Colonna",
+    "filter_collaborator": "Collaboratore",
+    "filter_priority": "Priorità",
+    "filter_overdue": "In ritardo",
+    "filter_all": "Tutti",
+    "empty_column": "Trascina qui o aggiungi una task",
+    "tasks_count": "task"
+  },
+  "column_modal": {
+    "title_new": "Nuova Colonna",
+    "title_edit": "Modifica Colonna",
+    "name": "Nome *",
+    "color": "Colore intestazione",
+    "is_done": "Colonna di completamento (imposta completed_at sulle task)",
+    "save": "Salva",
+    "cancel": "Annulla",
+    "edit": "Modifica colonna",
+    "delete": "Elimina colonna"
+  },
+  "task_card": {
+    "edit": "Modifica task",
+    "delete": "Elimina task",
+    "move": "Sposta in altra colonna",
+    "timer_start": "Avvia timer",
+    "timer_stop": "Ferma timer",
+    "assigned_to": "Assegnata a",
+    "assigned_by": "Assegnata da",
+    "due": "Scadenza",
+    "hours": "ore"
+  },
+  "task_modal": {
+    "title_new": "Nuova Task",
+    "title_edit": "Modifica Task",
+    "title_field": "Titolo *",
+    "description": "Descrizione",
+    "color": "Colore card",
+    "priority": "Priorità",
+    "priority_low": "Bassa",
+    "priority_medium": "Media",
+    "priority_high": "Alta",
+    "assigned_to": "Assegnata a",
+    "assigned_by": "Assegnata da (riunione)",
+    "estimated_hours": "Ore stimate",
+    "actual_hours": "Ore effettive",
+    "due_date": "Scadenza",
+    "column": "Colonna",
+    "none": "— Nessuno —",
+    "timer_logs": "Storico sessioni timer",
+    "save": "Salva",
+    "cancel": "Annulla"
+  },
+  "collaborators": {
+    "title": "Collaboratori",
+    "add": "Aggiungi",
+    "name": "Nome *",
+    "role": "Ruolo",
+    "color": "Colore avatar",
+    "tasks_to": "task assegnate",
+    "tasks_by": "task assegnate da",
+    "edit": "Modifica",
+    "delete": "Elimina",
+    "empty": "Nessun collaboratore",
+    "save": "Salva",
+    "cancel": "Annulla",
+    "force_delete": "Elimina e rimuovi assegnazioni"
+  },
+  "export": {
+    "title": "Esporta Dati",
+    "json_title": "Esporta JSON",
+    "json_desc": "Scarica tutti i dati (progetti, colonne, task, collaboratori) in formato JSON strutturato.",
+    "json_btn": "Scarica JSON",
+    "db_title": "Scarica Database",
+    "db_desc": "Scarica il file SQLite cifrato. Richiede la stessa password per essere aperto.",
+    "db_btn": "Scarica .db"
+  },
+  "confirm": {
+    "title": "Conferma eliminazione",
+    "yes": "Elimina",
+    "no": "Annulla"
+  },
+  "priority": {
+    "low": "Bassa",
+    "medium": "Media",
+    "high": "Alta"
+  },
+  "toast": {
+    "saved": "Salvato",
+    "deleted": "Eliminato",
+    "error": "Errore",
+    "timer_started": "Timer avviato",
+    "timer_stopped": "Timer fermato"
+  }
+}

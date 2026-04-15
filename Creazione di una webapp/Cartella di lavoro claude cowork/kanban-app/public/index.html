@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#6366f1"/>
+  <title>Kanban App</title>
+  <link rel="manifest" href="/manifest.json"/>
+  <link rel="icon" href="/icons/icon.svg" type="image/svg+xml"/>
+  <link rel="stylesheet" href="/style.css"/>
+</head>
+<body>
+
+<!-- ═══════════════════════════ LOGIN VIEW ═══════════════════════════════════ -->
+<div id="view-login">
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-logo">
+        <img src="/icons/icon.svg" alt="Logo" width="56" height="56"/>
+      </div>
+      <h1 class="login-title" id="login-heading" data-i18n="login.title">Accedi</h1>
+
+      <!-- Form login normale -->
+      <form id="form-login" autocomplete="off">
+        <label class="field-label" data-i18n="login.password">Password</label>
+        <div class="input-group">
+          <input id="login-password" type="password" class="input" autocomplete="current-password" required/>
+          <button type="button" class="btn-eye" id="btn-toggle-pw" title="Mostra/nascondi password">👁</button>
+        </div>
+        <p id="login-error" class="form-error" hidden></p>
+        <button type="submit" class="btn btn-primary btn-block" id="btn-login" data-i18n="login.btn_login">Accedi</button>
+      </form>
+
+      <!-- Form primo setup (hidden by default) -->
+      <form id="form-setup" hidden autocomplete="off">
+        <p class="hint-text" id="setup-hint" data-i18n="login.first_run_hint"></p>
+        <label class="field-label" data-i18n="login.password">Password</label>
+        <div class="input-group">
+          <input id="setup-password" type="password" class="input" autocomplete="new-password" minlength="6" required/>
+        </div>
+        <label class="field-label" data-i18n="login.confirm_password">Conferma Password</label>
+        <div class="input-group">
+          <input id="setup-confirm" type="password" class="input" autocomplete="new-password" minlength="6" required/>
+        </div>
+        <p id="setup-error" class="form-error" hidden></p>
+        <button type="submit" class="btn btn-primary btn-block" data-i18n="login.btn_create">Crea Database</button>
+        <button type="button" class="btn btn-ghost btn-block" id="btn-back-login" data-i18n="login.return_login">Hai già un database?</button>
+      </form>
+
+      <!-- Selettore lingua -->
+      <div class="lang-select-wrap">
+        <select id="lang-login" class="lang-select" title="Lingua / Language">
+          <option value="it">🇮🇹 Italiano</option>
+          <option value="en">🇬🇧 English</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ APP VIEW ════════════════════════════════════ -->
+<div id="view-app" hidden>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-left">
+      <button id="btn-back" class="btn btn-ghost" hidden title="">← Progetti</button>
+      <div class="header-brand">
+        <img src="/icons/icon.svg" alt="" width="28" height="28"/>
+        <span id="header-title" class="header-title">Kanban App</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <!-- Filtri kanban (visibili solo in vista kanban) -->
+      <div id="kanban-filters" class="kanban-filters" hidden>
+        <select id="filter-collaborator" class="filter-select" title="">
+          <option value="">👤 Tutti</option>
+        </select>
+        <select id="filter-priority" class="filter-select" title="">
+          <option value="">🔥 Tutte</option>
+          <option value="high">Alta</option>
+          <option value="medium">Media</option>
+          <option value="low">Bassa</option>
+        </select>
+        <label class="filter-checkbox" title="">
+          <input type="checkbox" id="filter-overdue"/> ⏰
+        </label>
+      </div>
+      <button id="btn-new-project" class="btn btn-primary" hidden data-i18n="projects.new">Nuovo Progetto</button>
+      <button id="btn-add-task"   class="btn btn-primary" hidden data-i18n="kanban.add_task">+ Task</button>
+      <button id="btn-add-column" class="btn btn-secondary" hidden data-i18n="kanban.add_column">+ Colonna</button>
+      <button id="btn-collaborators" class="btn-icon" title="" data-i18n-title="header.collaborators">👥</button>
+      <button id="btn-export"        class="btn-icon" title="" data-i18n-title="header.export">📦</button>
+      <select id="lang-app" class="lang-select" title="Lingua / Language">
+        <option value="it">🇮🇹</option>
+        <option value="en">🇬🇧</option>
+      </select>
+      <button id="btn-logout" class="btn-icon" title="" data-i18n-title="header.logout">🚪</button>
+    </div>
+  </header>
+
+  <!-- ── Progetti ── -->
+  <main id="view-projects">
+    <div class="page-header">
+      <h2 data-i18n="projects.title">I miei Progetti</h2>
+    </div>
+    <div id="projects-grid" class="projects-grid"></div>
+  </main>
+
+  <!-- ── Kanban ── -->
+  <main id="view-kanban" hidden>
+    <div id="kanban-board" class="kanban-board"></div>
+  </main>
+
+</div><!-- /view-app -->
+
+<!-- ═══════════════════════════ MODALI ══════════════════════════════════════ -->
+
+<!-- Modal Progetto -->
+<div id="modal-project" class="modal-overlay" hidden role="dialog" aria-modal="true">
+  <div class="modal modal-md">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modal-project-title" data-i18n="project_modal.title_new">Nuovo Progetto</h3>
+      <button class="btn-close" data-close-modal="modal-project" title="Chiudi">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="project-id"/>
+      <div class="field">
+        <label class="field-label" data-i18n="project_modal.name">Nome *</label>
+        <input id="project-name" type="text" class="input" required/>
+      </div>
+      <div class="field">
+        <label class="field-label" data-i18n="project_modal.description">Descrizione</label>
+        <textarea id="project-description" class="input textarea" rows="2"></textarea>
+      </div>
+      <div class="field">
+        <label class="field-label" data-i18n="project_modal.color">Colore</label>
+        <div class="color-picker" id="project-color-picker" data-target="project-color"></div>
+        <input type="hidden" id="project-color" value="#6366f1"/>
+      </div>
+      <div class="field">
+        <label class="field-label" data-i18n="project_modal.deadline">Scadenza</label>
+        <input id="project-deadline" type="date" class="input"/>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" data-close-modal="modal-project" data-i18n="project_modal.cancel">Annulla</button>
+      <button class="btn btn-primary" id="btn-save-project" data-i18n="project_modal.save">Salva</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Colonna -->
+<div id="modal-column" class="modal-overlay" hidden role="dialog" aria-modal="true">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modal-column-title" data-i18n="column_modal.title_new">Nuova Colonna</h3>
+      <button class="btn-close" data-close-modal="modal-column" title="Chiudi">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="column-id"/>
+      <input type="hidden" id="column-project-id"/>
+      <div class="field">
+        <label class="field-label" data-i18n="column_modal.name">Nome *</label>
+        <input id="column-name" type="text" class="input" required/>
+      </div>
+      <div class="field">
+        <label class="field-label" data-i18n="column_modal.color">Colore intestazione</label>
+        <div class="color-picker" id="column-color-picker" data-target="column-color"></div>
+        <input type="hidden" id="column-color" value="#64748b"/>
+      </div>
+      <div class="field field-inline">
+        <input id="column-is-done" type="checkbox"/>
+        <label for="column-is-done" class="field-label" data-i18n="column_modal.is_done">Colonna di completamento</label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" data-close-modal="modal-column" data-i18n="column_modal.cancel">Annulla</button>
+      <button class="btn btn-primary" id="btn-save-column" data-i18n="column_modal.save">Salva</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Task -->
+<div id="modal-task" class="modal-overlay" hidden role="dialog" aria-modal="true">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modal-task-title" data-i18n="task_modal.title_new">Nuova Task</h3>
+      <button class="btn-close" data-close-modal="modal-task" title="Chiudi">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="task-id"/>
+      <input type="hidden" id="task-project-id"/>
+      <div class="field">
+        <label class="field-label" data-i18n="task_modal.title_field">Titolo *</label>
+        <input id="task-title" type="text" class="input" required/>
+      </div>
+      <div class="field">
+        <label class="field-label" data-i18n="task_modal.description">Descrizione</label>
+        <textarea id="task-description" class="input textarea" rows="3"></textarea>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label class="field-label" data-i18n="task_modal.color">Colore card</label>
+          <div class="color-picker" id="task-color-picker" data-target="task-color"></div>
+          <input type="hidden" id="task-color" value="#6366f1"/>
+        </div>
+        <div class="field">
+          <label class="field-label" data-i18n="task_modal.priority">Priorità</label>
+          <div class="priority-selector" id="priority-selector">
+            <button type="button" class="priority-btn" data-priority="low" data-i18n="task_modal.priority_low">Bassa</button>
+            <button type="button" class="priority-btn active" data-priority="medium" data-i18n="task_modal.priority_medium">Media</button>
+            <button type="button" class="priority-btn" data-priority="high" data-i18n="task_modal.priority_high">Alta</button>
+          </div>
+          <input type="hidden" id="task-priority" value="medium"/>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label class="field-label" data-i18n="task_modal.assigned_to">Assegnata a</label>
+          <select id="task-assigned-to" class="input select"></select>
+        </div>
+        <div class="field">
+          <label class="field-label" data-i18n="task_modal.assigned_by">Assegnata da (riunione)</label>
+          <select id="task-assigned-by" class="input select"></select>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label class="field-label" data-i18n="task_modal.estimated_hours">Ore stimate</label>
+          <input id="task-estimated-hours" type="number" class="input" min="0" step="0.5"/>
+        </div>
+        <div class="field">
+          <label class="field-label" data-i18n="task_modal.actual_hours">Ore effettive</label>
+          <input id="task-actual-hours" type="number" class="input" min="0" step="0.1"/>
+        </div>
+        <div class="field">
+          <label class="field-label" data-i18n="task_modal.due_date">Scadenza</label>
+          <input id="task-due-date" type="date" class="input"/>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label" data-i18n="task_modal.column">Colonna</label>
+        <select id="task-column" class="input select"></select>
+      </div>
+      <!-- Storico timer (collapsible) -->
+      <details id="task-timer-logs-wrap" hidden>
+        <summary class="field-label" style="cursor:pointer" data-i18n="task_modal.timer_logs">Storico sessioni timer</summary>
+        <div id="task-timer-logs" class="timer-logs"></div>
+      </details>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" data-close-modal="modal-task" data-i18n="task_modal.cancel">Annulla</button>
+      <button class="btn btn-primary" id="btn-save-task" data-i18n="task_modal.save">Salva</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Collaboratori -->
+<div id="modal-collaborators" class="modal-overlay" hidden role="dialog" aria-modal="true">
+  <div class="modal modal-md">
+    <div class="modal-header">
+      <h3 class="modal-title" data-i18n="collaborators.title">Collaboratori</h3>
+      <button class="btn-close" data-close-modal="modal-collaborators" title="Chiudi">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- Form aggiunta/modifica -->
+      <div id="collab-form" class="collab-form">
+        <input type="hidden" id="collab-id"/>
+        <div class="field-row">
+          <div class="field" style="flex:2">
+            <label class="field-label" data-i18n="collaborators.name">Nome *</label>
+            <input id="collab-name" type="text" class="input"/>
+          </div>
+          <div class="field" style="flex:1">
+            <label class="field-label" data-i18n="collaborators.role">Ruolo</label>
+            <input id="collab-role" type="text" class="input"/>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label" data-i18n="collaborators.color">Colore avatar</label>
+          <div class="color-picker" id="collab-color-picker" data-target="collab-color"></div>
+          <input type="hidden" id="collab-color" value="#6366f1"/>
+        </div>
+        <div class="collab-form-actions">
+          <button class="btn btn-ghost btn-sm" id="btn-cancel-collab" data-i18n="collaborators.cancel">Annulla</button>
+          <button class="btn btn-primary btn-sm" id="btn-save-collab" data-i18n="collaborators.save">Salva</button>
+        </div>
+      </div>
+      <!-- Lista -->
+      <div id="collab-list" class="collab-list"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="btn-new-collab">
+        + <span data-i18n="collaborators.add">Aggiungi</span>
+      </button>
+      <button class="btn btn-ghost" data-close-modal="modal-collaborators" data-i18n="collaborators.cancel">Chiudi</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Export -->
+<div id="modal-export" class="modal-overlay" hidden role="dialog" aria-modal="true">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <h3 class="modal-title" data-i18n="export.title">Esporta Dati</h3>
+      <button class="btn-close" data-close-modal="modal-export" title="Chiudi">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="export-option">
+        <div>
+          <strong data-i18n="export.json_title">Esporta JSON</strong>
+          <p class="hint-text" data-i18n="export.json_desc">Scarica tutti i dati in formato JSON strutturato.</p>
+        </div>
+        <a id="btn-export-json" href="/api/export/json" download class="btn btn-secondary" data-i18n="export.json_btn">Scarica JSON</a>
+      </div>
+      <div class="export-option">
+        <div>
+          <strong data-i18n="export.db_title">Scarica Database</strong>
+          <p class="hint-text" data-i18n="export.db_desc">File SQLite cifrato. Richiede la stessa password.</p>
+        </div>
+        <a id="btn-export-db" href="/api/export/db" download class="btn btn-secondary" data-i18n="export.db_btn">Scarica .db</a>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" data-close-modal="modal-export">Chiudi</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Conferma eliminazione -->
+<div id="modal-confirm" class="modal-overlay" hidden role="dialog" aria-modal="true">
+  <div class="modal modal-xs">
+    <div class="modal-header">
+      <h3 class="modal-title" data-i18n="confirm.title">Conferma eliminazione</h3>
+    </div>
+    <div class="modal-body">
+      <p id="confirm-message"></p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="btn-confirm-no" data-i18n="confirm.no">Annulla</button>
+      <button class="btn btn-danger" id="btn-confirm-yes" data-i18n="confirm.yes">Elimina</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div id="toast-container" aria-live="polite"></div>
+
+<!-- PWA Install Banner -->
+<div id="pwa-banner" hidden>
+  <span id="pwa-text">Installa l'app per accesso rapido</span>
+  <button id="btn-pwa-install" class="btn btn-primary btn-sm">Installa</button>
+  <button id="btn-pwa-dismiss" class="btn-close">✕</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+{
+  "app_name": "Kanban App",
+  "login": {
+    "title": "Sign In",
+    "setup_title": "Create Database",
+    "password": "Password",
+    "confirm_password": "Confirm Password",
+    "btn_login": "Sign In",
+    "btn_create": "Create Database",
+    "wrong_password": "Wrong password. Please try again.",
+    "passwords_mismatch": "Passwords do not match.",
+    "password_too_short": "Password must be at least 6 characters.",
+    "first_run_hint": "First launch: choose a password to protect your database.",
+    "return_login": "Already have a database?"
+  },
+  "header": {
+    "collaborators": "Collaborators",
+    "export": "Export data",
+    "logout": "Logout",
+    "back": "← Projects"
+  },
+  "projects": {
+    "title": "My Projects",
+    "new": "New Project",
+    "empty": "No projects yet. Create one!",
+    "tasks_total": "total tasks",
+    "tasks_done": "completed",
+    "edit": "Edit project",
+    "delete": "Delete project",
+    "open": "Open kanban",
+    "deadline": "Deadline"
+  },
+  "project_modal": {
+    "title_new": "New Project",
+    "title_edit": "Edit Project",
+    "name": "Name *",
+    "description": "Description",
+    "color": "Color",
+    "deadline": "Deadline",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "kanban": {
+    "add_task": "+ Task",
+    "add_column": "+ Column",
+    "filter_collaborator": "Collaborator",
+    "filter_priority": "Priority",
+    "filter_overdue": "Overdue",
+    "filter_all": "All",
+    "empty_column": "Drag here or add a task",
+    "tasks_count": "tasks"
+  },
+  "column_modal": {
+    "title_new": "New Column",
+    "title_edit": "Edit Column",
+    "name": "Name *",
+    "color": "Header color",
+    "is_done": "Done column (sets completed_at on tasks)",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit column",
+    "delete": "Delete column"
+  },
+  "task_card": {
+    "edit": "Edit task",
+    "delete": "Delete task",
+    "move": "Move to another column",
+    "timer_start": "Start timer",
+    "timer_stop": "Stop timer",
+    "assigned_to": "Assigned to",
+    "assigned_by": "Assigned by",
+    "due": "Due",
+    "hours": "h"
+  },
+  "task_modal": {
+    "title_new": "New Task",
+    "title_edit": "Edit Task",
+    "title_field": "Title *",
+    "description": "Description",
+    "color": "Card color",
+    "priority": "Priority",
+    "priority_low": "Low",
+    "priority_medium": "Medium",
+    "priority_high": "High",
+    "assigned_to": "Assigned to",
+    "assigned_by": "Assigned by (meeting)",
+    "estimated_hours": "Estimated hours",
+    "actual_hours": "Actual hours",
+    "due_date": "Due date",
+    "column": "Column",
+    "none": "— None —",
+    "timer_logs": "Timer session history",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "collaborators": {
+    "title": "Collaborators",
+    "add": "Add",
+    "name": "Name *",
+    "role": "Role",
+    "color": "Avatar color",
+    "tasks_to": "assigned tasks",
+    "tasks_by": "tasks assigned by",
+    "edit": "Edit",
+    "delete": "Delete",
+    "empty": "No collaborators",
+    "save": "Save",
+    "cancel": "Cancel",
+    "force_delete": "Delete and remove assignments"
+  },
+  "export": {
+    "title": "Export Data",
+    "json_title": "Export JSON",
+    "json_desc": "Download all data (projects, columns, tasks, collaborators) as structured JSON.",
+    "json_btn": "Download JSON",
+    "db_title": "Download Database",
+    "db_desc": "Download the encrypted SQLite file. Requires the same password to open.",
+    "db_btn": "Download .db"
+  },
+  "confirm": {
+    "title": "Confirm deletion",
+    "yes": "Delete",
+    "no": "Cancel"
+  },
+  "priority": {
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High"
+  },
+  "toast": {
+    "saved": "Saved",
+    "deleted": "Deleted",
+    "error": "Error",
+    "timer_started": "Timer started",
+    "timer_stopped": "Timer stopped"
+  }
+}

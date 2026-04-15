@@ -1,0 +1,19 @@
+{
+  "name": "Kanban Task Manager",
+  "short_name": "Kanban",
+  "description": "Gestione progetti e task con kanban board",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#6366f1",
+  "background_color": "#f1f5f9",
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "utilities"]
+}
