@@ -1,44 +1,81 @@
 'use strict';
-const Database = require('better-sqlite3-multiple-ciphers');
-const path = require('path');
-const fs = require('fs');
+/**
+ * Protezione DB:
+ *  - La password viene hashata con scrypt (crypto built-in) e salvata in `.auth`
+ *  - Il file `data.db` NON è cifrato a livello filesystem (better-sqlite3 standard)
+ *  - L'accesso è protetto a livello applicativo: senza la password corretta
+ *    la sessione Express non viene autenticata e nessuna API risponde
+ *  - Il file `.auth` non contiene la password in chiaro
+ */
+const Database = require('better-sqlite3');
+const crypto   = require('crypto');
+const path     = require('path');
+const fs       = require('fs');
 
-const DB_PATH = path.join(__dirname, 'data.db');
+const DB_PATH   = path.join(__dirname, 'data.db');
+const AUTH_PATH = path.join(__dirname, '.auth');
+
 let db = null;
 
 function isFirstRun() {
-  return !fs.existsSync(DB_PATH);
+  return !fs.existsSync(AUTH_PATH);
 }
 
-function getDb() {
-  return db;
+function getDb() { return db; }
+
+// ─── Password hashing ────────────────────────────────────────────────────────
+function hashPassword(password) {
+  const salt = crypto.randomBytes(32).toString('hex');
+  const key  = crypto.scryptSync(password, salt, 64).toString('hex');
+  return JSON.stringify({ key, salt });
 }
 
-function openDatabase(password) {
-  const firstRun = !fs.existsSync(DB_PATH);
-  let instance;
+function verifyPassword(password, stored) {
   try {
-    instance = new Database(DB_PATH);
-    // Chiave SQLCipher — deve essere il PRIMO pragma eseguito
-    instance.pragma(`key="${password.replace(/"/g, '""')}"`);
-    // Test: se la chiave è errata, questa query lancia un'eccezione
-    instance.prepare('SELECT count(*) FROM sqlite_master').get();
+    const { key, salt } = JSON.parse(stored);
+    const derived = crypto.scryptSync(password, salt, 64).toString('hex');
+    return crypto.timingSafeEqual(Buffer.from(derived, 'hex'), Buffer.from(key, 'hex'));
+  } catch { return false; }
+}
 
-    db = instance;
-    db.pragma('foreign_keys = ON');
-    db.pragma('journal_mode = WAL');
+// ─── Open / Create ──────────────────────────────────────────────────────────
+function openDatabase(password) {
+  const firstRun = !fs.existsSync(AUTH_PATH);
 
-    if (firstRun) {
+  if (firstRun) {
+    // Primo avvio: crea DB + salva hash password
+    let instance;
+    try {
+      instance = new Database(DB_PATH);
+      instance.pragma('journal_mode = WAL');
+      instance.pragma('foreign_keys = ON');
+      db = instance;
+      fs.writeFileSync(AUTH_PATH, hashPassword(password));
       initializeSchema();
+      return { success: true, firstRun: true };
+    } catch (err) {
+      if (instance) { try { instance.close(); } catch (_) {} }
+      if (fs.existsSync(DB_PATH))   try { fs.unlinkSync(DB_PATH);   } catch (_) {}
+      if (fs.existsSync(AUTH_PATH)) try { fs.unlinkSync(AUTH_PATH); } catch (_) {}
+      return { success: false, error: err.message };
     }
-    return { success: true, firstRun };
-  } catch (err) {
-    if (instance) { try { instance.close(); } catch (_) {} }
-    // Se era un primo avvio e fallisce, rimuoviamo il file vuoto/corrotto
-    if (firstRun && fs.existsSync(DB_PATH)) {
-      try { fs.unlinkSync(DB_PATH); } catch (_) {}
+  } else {
+    // Login: verifica password
+    const stored = fs.readFileSync(AUTH_PATH, 'utf8');
+    if (!verifyPassword(password, stored)) {
+      return { success: false, error: 'Password errata' };
     }
-    return { success: false, error: 'Password errata' };
+    let instance;
+    try {
+      instance = new Database(DB_PATH);
+      instance.pragma('journal_mode = WAL');
+      instance.pragma('foreign_keys = ON');
+      db = instance;
+      return { success: true, firstRun: false };
+    } catch (err) {
+      if (instance) { try { instance.close(); } catch (_) {} }
+      return { success: false, error: err.message };
+    }
   }
 }
 
@@ -46,6 +83,7 @@ function closeDatabase() {
   if (db) { db.close(); db = null; }
 }
 
+// ─── Schema ──────────────────────────────────────────────────────────────────
 function initializeSchema() {
   const version = db.pragma('user_version', { simple: true });
   if (version > 0) return;
@@ -123,11 +161,10 @@ function seedExampleData() {
   const c2 = ic.run('Giulia Bianchi', 'Designer',        '#ec4899').lastInsertRowid;
   const c3 = ic.run('Luca Verdi',     'Project Manager', '#10b981').lastInsertRowid;
 
-  const ip = db.prepare(
-    'INSERT INTO projects (name, description, color, deadline) VALUES (?, ?, ?, ?)'
-  );
   const deadline = new Date(Date.now() + 30 * 86400 * 1000).toISOString().slice(0, 10);
-  const p1 = ip.run('Progetto Demo', "Progetto di esempio per esplorare l'app", '#6366f1', deadline).lastInsertRowid;
+  const p1 = db.prepare(
+    'INSERT INTO projects (name, description, color, deadline) VALUES (?, ?, ?, ?)'
+  ).run('Progetto Demo', "Progetto di esempio per esplorare l'app", '#6366f1', deadline).lastInsertRowid;
 
   const ico = db.prepare(
     'INSERT INTO columns (project_id, name, position, color, is_done) VALUES (?, ?, ?, ?, ?)'
@@ -138,13 +175,14 @@ function seedExampleData() {
 
   const it = db.prepare(`
     INSERT INTO tasks
-      (column_id, project_id, title, description, color, priority, assigned_to, assigned_by, estimated_hours, due_date, position)
+      (column_id, project_id, title, description, color, priority,
+       assigned_to, assigned_by, estimated_hours, due_date, position)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
-  it.run(col1, p1, 'Analisi requisiti',        'Raccogliere e documentare i requisiti',      '#6366f1', 'high',   c1, c3, 8,  deadline, 0);
-  it.run(col1, p1, 'Setup ambiente sviluppo',  'Configurare repo, CI/CD e ambienti',         '#f59e0b', 'medium', c1, c3, 4,  null,     1);
-  it.run(col2, p1, 'Design mockup',            "Wireframe e mockup dell'interfaccia",         '#ec4899', 'high',   c2, c3, 16, deadline, 0);
-  it.run(col3, p1, 'Kick-off meeting',         'Riunione di avvio con tutti gli stakeholder','#10b981', 'medium', c3, c3, 2,  null,     0);
+  it.run(col1, p1, 'Analisi requisiti',       'Raccogliere e documentare i requisiti',       '#6366f1', 'high',   c1, c3, 8,  deadline, 0);
+  it.run(col1, p1, 'Setup ambiente sviluppo', 'Configurare repo, CI/CD e ambienti',          '#f59e0b', 'medium', c1, c3, 4,  null,     1);
+  it.run(col2, p1, 'Design mockup',           "Wireframe e mockup dell'interfaccia",          '#ec4899', 'high',   c2, c3, 16, deadline, 0);
+  it.run(col3, p1, 'Kick-off meeting',        'Riunione di avvio con tutti gli stakeholder', '#10b981', 'medium', c3, c3, 2,  null,     0);
 }
 
 module.exports = { isFirstRun, getDb, openDatabase, closeDatabase };

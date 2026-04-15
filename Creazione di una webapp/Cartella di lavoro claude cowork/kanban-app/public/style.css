@@ -1,4 +1,6 @@
 /* ─── Reset & Base ─────────────────────────────────────────────────────────── */
+/* Garantisce che l'attributo [hidden] vinca sempre su qualsiasi display CSS */
+[hidden] { display: none !important; }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-size: 15px; -webkit-text-size-adjust: 100%; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;

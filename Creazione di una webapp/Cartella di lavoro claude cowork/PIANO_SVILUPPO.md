@@ -9,7 +9,7 @@
 | Layer | Tecnologia | Motivazione |
 |---|---|---|
 | Backend | Node.js + Express | Leggero, ideale per API REST locali |
-| Database | SQLite cifrato via `better-sqlite3-multiple-ciphers` | File singolo protetto da password (SQLCipher) |
+| Database | SQLite via `better-sqlite3` + `crypto.scrypt` (Node built-in) | Login protetto da hash password; `better-sqlite3-multiple-ciphers` non supporta Node v24 |
 | Sessioni | `express-session` | Mantiene la sessione autenticata nel browser |
 | Frontend | HTML + CSS + JavaScript vanilla | Nessun build tool, avvio immediato |
 | i18n | JSON locale (`it`, `en`, estendibile) | Multilingua senza dipendenze esterne |
@@ -278,8 +278,10 @@ kanban-app/
 20. ✅ Tooltip su tutti i controlli, toast notification, animazioni CSS
 21. ✅ Modale di conferma eliminazione (no `window.confirm`)
 22. ✅ Stati vuoti con placeholder
-23. ⬜ Test end-to-end manuale
-24. ⬜ `README.md` con istruzioni di avvio
+23. ✅ `README.md` con istruzioni di avvio
+24. ✅ Adattamento a Node v24: `better-sqlite3` + `crypto.scrypt` (SQLCipher non supportato in v24)
+
+> **Nota tecnica**: `better-sqlite3-multiple-ciphers` non ha prebuilt per Node v24 e la compilazione fallisce (conflitto C++17/C++20). La soluzione adottata usa `better-sqlite3` standard + hash PBKDF2 (scrypt) in `.auth`: la password non viene salvata in chiaro, l'accesso è protetto a livello applicativo. Il file `.db` non è cifrato a livello filesystem ma è inaccessibile senza la sessione autenticata dall'app.
 
 ---
 

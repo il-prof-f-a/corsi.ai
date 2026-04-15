@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(node -e \"require\\('./database'\\); require\\('./server'\\)\")",
+      "Bash(curl -s http://localhost:3000/api/auth/status)",
+      "Bash(npx playwright:*)",
+      "Bash(npx puppeteer:*)",
+      "Bash(where chromium:*)",
+      "Bash(where chromium-browser:*)",
+      "Bash(where chrome:*)",
+      "Read(//c/Program Files/Google/Chrome/Application/**)",
+      "Read(//c/Program Files \\(x86\\)/Microsoft/Edge/Application/**)",
+      "Read(//c/Program Files/Microsoft/Edge/Application/**)",
+      "Bash(node test-browser.js)"
+    ]
+  }
+}
