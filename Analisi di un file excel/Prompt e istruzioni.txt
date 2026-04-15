@@ -1,0 +1,13 @@
+1) spese regioni italiane mensili filetype:xlsx
+da cmd sulla cartella con il solo file:
+https://github.com/features/copilot/cli/ opp https://github.com/github/copilot-cli/releases
+-copilot		/model	/init	
+-gemini			/init
+prompt: 
+-analizzami il file e dimmi di che cosa parla, cerca online per contestualizzare. Parlami sempre in italiano e creami un file .md con eventuali grafici o schemi in mermaid come riassunto o schema concettuale, mappa
+-potresti farmi un grafico su file (possibilmente .svg) che mostra le relazioni tra Valore Aggiunto, Ore Lavorate e Lavoratori?
+-adesso mi fai un grafico che mette in relazione i lavoratori (sulle ascisse) e il Valore Aggiunto e le Ore Lavorate come due serie dipendenti sulle ordinate?
+-ok puoi scrivermi la formula che correla ai lavoratori il valore aggiunto e le ore lavorate?
+-puoi approssimare con una retta di regressione?
+-puoi approssimare con una polinomiale di grado 5 e mi fornisci tutti i parametri?
+-mi disegni entrambe le curve sull'immagine precedentemente generata sulle relazioni dei tre indicatori?
