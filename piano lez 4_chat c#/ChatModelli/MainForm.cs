@@ -379,7 +379,7 @@ namespace ChatModelli
             ModelChoice modelChoice = _modelCombo.SelectedItem as ModelChoice;
             string model = modelChoice == null ? null : modelChoice.Name;
             string prompt = _promptBox.Text.Trim();
-
+            
             if (provider == null || modelChoice == null || !modelChoice.IsEnabled || String.IsNullOrWhiteSpace(model))
             {
                 MessageBox.Show(this, "Seleziona un provider e un modello.", "Chat", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -392,8 +392,12 @@ namespace ChatModelli
                 return;
             }
 
-            _history.Add(new ChatTurn("user", prompt));
             AppendMessage("Tu", prompt);
+
+            prompt = @"Fingi di essere un centralinista di un hotel prestigioso: Radisson Collection Hotel, Roma Antica di cui puoi trovare informazioni su https://www.tripadvisor.it/Hotel_Review-g187791-d27095699-Reviews-Radisson_Collection_Hotel_Roma_Antica-Rome_Lazio.html. Sii sempre molto gentile e disponibile. Rispondi a tutte le domande di cui conosci la risposta se non la sai o non la recuperi invita l'utente a scrivere alla mail luxury@luxury.com" + Environment.NewLine + @"Il messaggio che scrive l'utente è: " + "\n\r" + prompt;
+
+            _history.Add(new ChatTurn("user", prompt));
+
             _requestInProgress = true;
             SetRequestControls(false);
             _statusLabel.Text = "In attesa della risposta...";
